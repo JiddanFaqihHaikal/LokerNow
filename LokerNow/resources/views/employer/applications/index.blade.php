@@ -9,28 +9,28 @@
     
     <!-- Search and Filter -->
     <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-6">
-        <div class="flex flex-col md:flex-row gap-4">
+        <form action="{{ route('employer.applications.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
             <div class="flex-grow">
-                <input type="text" placeholder="Search applications..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B9FF66]">
+                <input type="text" name="search" placeholder="Search applications..." value="{{ request('search') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B9FF66]">
             </div>
             <div class="flex gap-2">
-                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B9FF66]">
+                <select name="status" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B9FF66]">
                     <option value="">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="reviewed">Reviewed</option>
-                    <option value="interviewed">Interviewed</option>
-                    <option value="accepted">Accepted</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="reviewing" {{ request('status') == 'reviewing' ? 'selected' : '' }}>Reviewing</option>
+                    <option value="shortlisted" {{ request('status') == 'shortlisted' ? 'selected' : '' }}>Shortlisted</option>
+                    <option value="accepted" {{ request('status') == 'accepted' ? 'selected' : '' }}>Accepted</option>
+                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                 </select>
-                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B9FF66]">
+                <select name="job_id" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B9FF66]">
                     <option value="">All Jobs</option>
-                    <option value="1">Frontend Developer</option>
-                    <option value="2">UX Designer</option>
-                    <option value="3">Backend Developer</option>
+                    @foreach($jobs as $job)
+                        <option value="{{ $job->id_job }}" {{ request('job_id') == $job->id_job ? 'selected' : '' }}>{{ $job->title }}</option>
+                    @endforeach
                 </select>
-                <button class="bg-gray-800 text-white px-4 py-2 rounded-lg">Filter</button>
+                <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-lg">Filter</button>
             </div>
-        </div>
+        </form>
     </div>
     
     <!-- Applications Table -->
@@ -46,146 +46,72 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                <!-- Sample Application Row -->
+                @forelse($applications as $application)
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-3">
-                                JD
+                                {{ substr($application->user->name, 0, 1) }}{{ substr(explode(' ', $application->user->name)[1] ?? '', 0, 1) }}
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">John Doe</div>
-                                <div class="text-xs text-gray-500">john@example.com</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $application->user->name }}</div>
+                                <div class="text-xs text-gray-500">{{ $application->user->email }}</div>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">Frontend Developer</div>
-                        <div class="text-xs text-gray-500">Full-time</div>
+                        <div class="text-sm text-gray-900">{{ $application->job->title }}</div>
+                        <div class="text-xs text-gray-500">{{ $application->job->employment_type }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            Pending
+                        @php
+                            $statusColors = [
+                                'pending' => 'yellow',
+                                'reviewing' => 'blue',
+                                'shortlisted' => 'indigo',
+                                'accepted' => 'green',
+                                'rejected' => 'red',
+                                'withdrawn' => 'gray'
+                            ];
+                            $color = $statusColors[$application->status] ?? 'gray';
+                        @endphp
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $color }}-100 text-{{ $color }}-800">
+                            {{ ucfirst($application->status) }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        April 15, 2025
+                        {{ $application->created_at->format('M d, Y') }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
-                        <a href="#" class="text-green-600 hover:text-green-900 mr-3">Accept</a>
-                        <a href="#" class="text-red-600 hover:text-red-900">Reject</a>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex flex-wrap gap-2">
+                        <a href="{{ route('employer.applications.show', $application->id) }}" class="text-blue-600 hover:text-blue-900">View Application</a>
+                        <a href="{{ route('employer.candidates.show', $application->user->id) }}" class="text-purple-600 hover:text-purple-900 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            View Profile
+                        </a>
+                        @if($application->status == 'pending' || $application->status == 'reviewing' || $application->status == 'shortlisted')
+                            <a href="{{ route('employer.applications.update-status', ['id' => $application->id, 'status' => 'accepted']) }}" class="text-green-600 hover:text-green-900">Accept</a>
+                            <a href="{{ route('employer.applications.update-status', ['id' => $application->id, 'status' => 'rejected']) }}" class="text-red-600 hover:text-red-900">Reject</a>
+                        @endif
                     </td>
                 </tr>
-                
-                <!-- Sample Application Row -->
+                @empty
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-3">
-                                JS
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">Jane Smith</div>
-                                <div class="text-xs text-gray-500">jane@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">Backend Developer</div>
-                        <div class="text-xs text-gray-500">Full-time</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            Interviewed
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        April 10, 2025
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
-                        <a href="#" class="text-green-600 hover:text-green-900 mr-3">Accept</a>
-                        <a href="#" class="text-red-600 hover:text-red-900">Reject</a>
+                    <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p>No applications found</p>
                     </td>
                 </tr>
-                
-                <!-- Sample Application Row -->
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-3">
-                                RJ
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">Robert Johnson</div>
-                                <div class="text-xs text-gray-500">robert@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">UX Designer</div>
-                        <div class="text-xs text-gray-500">Contract</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            Accepted
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        April 5, 2025
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
-                    </td>
-                </tr>
+                @endforelse
             </tbody>
         </table>
         
         <!-- Pagination -->
         <div class="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-            <div class="flex-1 flex justify-between sm:hidden">
-                <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Previous
-                </a>
-                <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Next
-                </a>
-            </div>
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700">
-                        Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">20</span> results
-                    </p>
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <span class="sr-only">Previous</span>
-                            <!-- Heroicon name: solid/chevron-left -->
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            1
-                        </a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            2
-                        </a>
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            3
-                        </a>
-                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <span class="sr-only">Next</span>
-                            <!-- Heroicon name: solid/chevron-right -->
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </nav>
-                </div>
-            </div>
+            {{ $applications->withQueryString()->links() }}
         </div>
     </div>
 </div>

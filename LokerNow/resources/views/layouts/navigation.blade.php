@@ -15,6 +15,34 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    
+                    <x-nav-link :href="route('forum.index')" :active="request()->routeIs('forum.*')">
+                        {{ __('Open Forum') }}
+                    </x-nav-link>
+                    
+                    <x-nav-link :href="route('faq.index')" :active="request()->routeIs('faq.*')">
+                        {{ __('FAQ') }}
+                    </x-nav-link>
+                    
+                    @if(auth()->check() && auth()->user()->hasRole(['admin', 'moderator']))
+                        <x-nav-link :href="route('forum.moderation.reports')" :active="request()->routeIs('forum.moderation.*')">
+                            {{ __('Forum Moderation') }}
+                        </x-nav-link>
+                    @endif
+                    
+                    @if(auth()->check() && auth()->user()->hasRole('employer'))
+                        <x-nav-link :href="route('employer.subscription')" :active="request()->routeIs('employer.subscription')">
+                            {{ __('Subscription') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('employer.analytics')" :active="request()->routeIs('employer.analytics')">
+                            {{ __('Analytics') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('employer.jobs.create-ui')" :active="request()->routeIs('employer.jobs.create-ui')">
+                            {{ __('Post Job') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -70,6 +98,34 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('forum.index')" :active="request()->routeIs('forum.*')">
+                {{ __('Open Forum') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('faq.index')" :active="request()->routeIs('faq.*')">
+                {{ __('FAQ') }}
+            </x-responsive-nav-link>
+            
+            @if(auth()->check() && auth()->user()->hasRole(['admin', 'moderator']))
+                <x-responsive-nav-link :href="route('forum.moderation.reports')" :active="request()->routeIs('forum.moderation.*')">
+                    {{ __('Forum Moderation') }}
+                </x-responsive-nav-link>
+            @endif
+            
+            @if(auth()->check() && auth()->user()->hasRole('employer'))
+                <x-responsive-nav-link :href="route('employer.subscription')" :active="request()->routeIs('employer.subscription')">
+                    {{ __('Subscription') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('employer.analytics')" :active="request()->routeIs('employer.analytics')">
+                    {{ __('Analytics') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('employer.jobs.create-ui')" :active="request()->routeIs('employer.jobs.create-ui')">
+                    {{ __('Post Job') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

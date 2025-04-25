@@ -33,7 +33,7 @@ class AuthenticatedSessionController extends Controller
         
         if ($user->role === 'admin') {
             // Admin role sees the admin dashboard
-            return redirect()->intended('/admin/dashboard');
+            return redirect()->intended('/employer/dashboard');
         } else {
             // Default for job seekers
             return redirect()->intended('/dashboard');

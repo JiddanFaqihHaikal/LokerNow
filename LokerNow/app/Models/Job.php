@@ -51,4 +51,12 @@ class Job extends Model
         // Always return an empty collection since we don't need job applications
         return collect([]);
     }
+    
+    /**
+     * Get the users who saved this job.
+     */
+    public function savedBy()
+    {
+        return $this->hasMany(SavedJob::class, 'job_id', 'id_job');
+    }
 }

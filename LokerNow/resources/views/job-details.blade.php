@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-5xl mx-auto px-6 py-10">
-    <a href="{{ route('search.jobs') }}" class="inline-flex items-center text-gray-600 mb-6">
+<div class="py-12 px-6 bg-gray-900">
+    <div class="max-w-5xl mx-auto">
+    <a href="{{ route('search.jobs') }}" class="inline-flex items-center text-gray-400 hover:text-[#B9FF66] transition-colors mb-6">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
@@ -55,8 +56,65 @@
             </div>
         </div>
 
-        <div class="mt-6 flex gap-4">
-            <a href="#" class="bg-white text-black font-medium py-2 px-6 rounded-full">Save</a>
+        <div class="mt-6 flex gap-4" x-data="{ 
+            saved: {{ in_array($job->id_job, $savedJobIds ?? []) ? 'true' : 'false' }},
+            toggleSave() {
+                const jobId = {{ $job->id_job }};
+                if (this.saved) {
+                    // Remove from saved jobs
+                    fetch(`/jobs/${jobId}/unsave`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.saved = false;
+                        console.log('Job unsaved successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error unsaving job:', error);
+                        alert('Error removing job from saved list. Please try again.');
+                    });
+                } else {
+                    // Add to saved jobs
+                    fetch(`/jobs/${jobId}/save`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.saved = true;
+                        console.log('Job saved successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error saving job:', error);
+                        alert('Error saving job. Please try again.');
+                    });
+                }
+            }
+        }">
+            <button @click.prevent="toggleSave()" class="flex items-center gap-2 bg-white hover:bg-gray-100 text-black font-medium py-2 px-6 rounded-full transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="saved ? 'text-red-500 fill-red-500' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span x-text="saved ? 'Saved' : 'Save'"></span>
+            </button>
             <form action="{{ route('jobs.apply', $job->id_job) }}" method="POST" class="inline">
                 @csrf
                 <button type="submit" class="bg-black text-white font-medium py-2 px-6 rounded-full">Easy Apply</button>
@@ -64,15 +122,15 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl p-6 mb-8 shadow">
-        <h2 class="text-xl font-bold mb-4">Job Description</h2>
-        <div class="prose max-w-none">
+    <div class="bg-gray-800 text-white rounded-2xl p-6 mb-8 shadow border border-gray-700">
+        <h2 class="text-xl font-bold mb-4 text-[#B9FF66]">Job Description</h2>
+        <div class="prose prose-invert max-w-none text-gray-300">
             {!! nl2br(e($job->description)) !!}
         </div>
         
-        <div class="flex items-center justify-between border-t border-gray-200 pt-4 mt-6">
+        <div class="flex items-center justify-between border-t border-gray-700 pt-4 mt-6">
             <div>
-                <p class="text-sm text-gray-500">Posted on: 
+                <p class="text-sm text-gray-400">Posted on: 
                     @if($job->posting_date && !is_string($job->posting_date))
                         {{ $job->posting_date->format('M d, Y') }}
                     @else
@@ -81,6 +139,7 @@
                 </p>
             </div>
         </div>
+    </div>
     </div>
 </div>
 @endsection

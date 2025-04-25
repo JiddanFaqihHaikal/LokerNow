@@ -18,8 +18,18 @@ class JobApplication extends Model
         'user_id',
         'job_id',
         'status',
+        'status_updated_at',
         'cover_letter',
         'resume_path',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'status_updated_at' => 'datetime',
     ];
 
     /**

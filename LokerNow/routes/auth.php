@@ -13,10 +13,21 @@ use App\Http\Controllers\CompanyProfileController;  // <-- Add this line
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
+    // Registration selection page
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
+        
+    // Registration selection page (alternative route)
+    Route::get('register/select', [RegisteredUserController::class, 'showRegistrationSelection'])
+        ->name('register.select');
+        
+    // Job seeker registration
+    Route::get('register/jobseeker', [RegisteredUserController::class, 'showJobSeekerRegistration'])
+        ->name('register.jobseeker');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    // Process registration form
+    Route::post('register', [RegisteredUserController::class, 'store'])
+        ->name('register');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

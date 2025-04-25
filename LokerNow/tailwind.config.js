@@ -10,13 +10,30 @@ export default {
         './resources/js/**/*.js',
     ],
 
+    darkMode: 'class',
+
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Space Grotesk', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', 'Space Grotesk', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 'lime-green': '#B9FF66',
+                'brand': {
+                    DEFAULT: '#B9FF66',
+                    'light': '#d4ff9e',
+                    'dark': '#a7e55c',
+                },
+                'dark': {
+                    'bg': '#111827',
+                    'card': '#1F2937',
+                    'input': '#374151',
+                },
+                'light': {
+                    'bg': '#F9FAFB',
+                    'card': '#FFFFFF',
+                    'input': '#F3F4F6',
+                },
             },
         },
     },

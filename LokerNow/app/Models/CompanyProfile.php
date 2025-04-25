@@ -11,9 +11,12 @@ class CompanyProfile extends Model
 
     // Define the fillable attributes
     protected $fillable = [
+        'name',          // Company name
+        'website',       // Company website URL
         'logo_path',     // To store the path of the company logo
         'banner_path',   // To store the path of the company banner
         'tagline',       // To store the company's tagline
+        'user_id',       // Associated user ID
     ];
 
     // Optional: If you're storing the timestamps
@@ -24,7 +27,7 @@ class CompanyProfile extends Model
      */
     public function user()
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 }
 

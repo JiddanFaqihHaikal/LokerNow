@@ -41,7 +41,7 @@ class ApplicationController extends Controller
             ->first();
             
         if ($existingApplication) {
-            return redirect()->route('application.status')
+            return redirect()->route('jobseeker.applications.show', $existingApplication->id)
                 ->with('warning', 'You have already applied for this job.');
         }
         
@@ -50,9 +50,11 @@ class ApplicationController extends Controller
         $application->user_id = Auth::id();
         $application->job_id = $id;
         $application->status = 'pending';
+        $application->status_updated_at = now(); // Set the status updated timestamp
         $application->save();
         
-        return redirect()->route('application.status')
+        // Redirect to the jobseeker application details page
+        return redirect()->route('jobseeker.applications.show', $application->id)
             ->with('success', 'Your application has been submitted successfully!');
     }
 }

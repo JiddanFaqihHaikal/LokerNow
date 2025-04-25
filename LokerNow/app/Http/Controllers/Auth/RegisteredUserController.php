@@ -19,8 +19,27 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.register-jobseeker');
     }
+
+    /**
+     * Display the registration type selection view.
+     * Now redirects directly to job seeker registration
+     */
+    public function showRegistrationSelection(): View
+    {
+        return view('auth.register-jobseeker');
+    }
+
+    /**
+     * Display the job seeker registration view.
+     */
+    public function showJobSeekerRegistration(): View
+    {
+        return view('auth.register-jobseeker');
+    }
+
+    // Admin registration method removed for security
 
     /**
      * Handle an incoming registration request.
@@ -29,18 +48,26 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        // Force role to be jobseeker for security
+        $request->merge(['role' => 'jobseeker']);
+        
+        // Validation rules
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:jobseeker,admin'],
-        ]);
+            'phone' => ['required', 'string', 'max:20'],
+        ];
+        
+        $request->validate($rules);
 
+        // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'role' => 'jobseeker',
+            'phone' => $request->phone,
         ]);
 
         event(new Registered($user));
