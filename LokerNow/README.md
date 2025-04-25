@@ -51,7 +51,7 @@ The LokerNow platform is built around a relational database structure that conne
 
 1. Clone the repository:
    ```
-   git clone : <<GIT HUB LINK>>
+   git clone : https://github.com/JiddanFaqihHaikal/LokerNow/edit/Jiddan_Branch/LokerNow
    ```
 
 2. Navigate to the project directory:
