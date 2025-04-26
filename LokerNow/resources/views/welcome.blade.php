@@ -164,9 +164,12 @@
                         <div class="job-card bg-gray-800 rounded-lg shadow overflow-hidden">
                             <div class="p-6">
                                 <div class="flex items-start justify-between">
-                                    <div class="flex-shrink-0 h-14 w-14 rounded-md flex items-center justify-center overflow-hidden border border-gray-700">
-                                        @if(isset($companyProfiles[$job->company]) && $companyProfiles[$job->company]->logo_path)
-                                            <img src="{{ asset('storage/' . $companyProfiles[$job->company]->logo_path) }}" alt="{{ $job->company }} logo" class="w-14 h-14 object-cover">
+                                    <div class="flex-shrink-0 h-14 w-14 rounded-md flex items-center justify-center overflow-hidden">
+                                        @if(isset($jobPosters[$job->id_admin]) && 
+                                            isset($companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]) && 
+                                            $companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]->logo_path)
+                                            <img src="{{ asset('storage/' . $companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]->logo_path) }}" 
+                                                alt="{{ $job->company }} logo" class="w-14 h-14 object-cover">
                                         @else
                                             <div class="w-14 h-14 bg-[#B9FF66] text-black flex items-center justify-center text-lg font-bold">
                                                 {{ strtoupper(substr($job->company, 0, 2)) }}
@@ -180,7 +183,7 @@
                                     </button>
                                 </div>
                                 <h3 class="mt-4 text-lg font-medium text-white">{{ $job->title }}</h3>
-                                <p class="text-sm text-gray-400">{{ $job->company }}</p>
+                                <p class="text-sm text-gray-400">{{ isset($jobPosters[$job->id_admin]) && isset($companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]) ? $companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]->name : $job->company }}</p>
                                 <div class="mt-4">
                                     <div class="flex items-center text-sm text-gray-400">
                                         <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

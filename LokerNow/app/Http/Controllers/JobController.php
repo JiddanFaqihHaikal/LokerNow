@@ -100,7 +100,15 @@ class JobController extends Controller
         }
         
         // Get company profiles to access logos
-        $companyProfiles = CompanyProfile::all()->keyBy('name');
+        $companyProfiles = CompanyProfile::all()->keyBy('id');
+        
+        // Get the users who posted these jobs to access their company profiles
+        $jobPosters = [];
+        if ($jobs->count() > 0) {
+            $jobPosters = \App\Models\User::whereIn('id', $jobs->pluck('id_admin'))
+                ->get()
+                ->keyBy('id');
+        }
         
         // Debug: Log the job count
         \Log::info('Job count: ' . $jobs->count());
@@ -108,7 +116,7 @@ class JobController extends Controller
             \Log::info('First job: ' . json_encode($jobs->first()->toArray()));
         }
         
-        return view('search-jobs', compact('jobs', 'savedJobIds', 'companyProfiles'));
+        return view('search-jobs', compact('jobs', 'savedJobIds', 'companyProfiles', 'jobPosters'));
     }
     
     /**
@@ -147,7 +155,13 @@ class JobController extends Controller
                 ->toArray();
         }
         
-        return view('job-details', compact('job', 'isSaved', 'similarJobs', 'savedJobIds'));
+        // Get company profiles to access logos and company names
+        $companyProfiles = CompanyProfile::all()->keyBy('id');
+        
+        // Get the user who posted this job to access their company profile
+        $jobPoster = \App\Models\User::find($job->id_admin);
+        
+        return view('job-details', compact('job', 'isSaved', 'similarJobs', 'savedJobIds', 'companyProfiles', 'jobPoster'));
     }
     
     /**

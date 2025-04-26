@@ -316,9 +316,12 @@
                     <div class="job-card bg-gray-800 text-white rounded-2xl p-6 relative shadow-lg border border-gray-700">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center gap-3">
-                                <div class="company-logo h-14 w-14 rounded-md overflow-hidden border border-gray-700 flex-shrink-0">
-                                    @if(isset($companyProfiles[$job->company]) && $companyProfiles[$job->company]->logo_path)
-                                        <img src="{{ asset('storage/' . $companyProfiles[$job->company]->logo_path) }}" alt="{{ $job->company }} logo" class="w-14 h-14 object-cover">
+                                <div class="company-logo h-14 w-14 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                    @if(isset($jobPosters[$job->id_admin]) && 
+                                        isset($companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]) && 
+                                        $companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]->logo_path)
+                                        <img src="{{ asset('storage/' . $companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]->logo_path) }}" 
+                                            alt="{{ $job->company }} logo" class="w-12 h-12 object-contain">
                                     @else
                                         <div class="w-14 h-14 bg-[#B9FF66] text-black flex items-center justify-center text-lg font-bold">
                                             {{ strtoupper(substr($job->company, 0, 2)) }}
@@ -327,7 +330,7 @@
                                 </div>
                                 <div>
                                     <h2 class="text-lg font-bold">{{ $job->title }}</h2>
-                                    <p class="text-sm text-gray-300">{{ $job->company }}</p>
+                                    <p class="text-sm text-gray-300">{{ isset($jobPosters[$job->id_admin]) && isset($companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]) ? $companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]->name : $job->company }}</p>
                                 </div>
                             </div>
                             <div x-data="{ 

@@ -53,7 +53,7 @@
                                         <span class="ml-3 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Pending</span>
                                     @endif
                                 </div>
-                                <p class="text-gray-600 text-sm mb-3">{{ $application->job->company }}</p>
+                                <p class="text-gray-600 text-sm mb-3">{{ isset($jobPosters[$application->job->id_admin]) && isset($companyProfiles[$jobPosters[$application->job->id_admin]->company_profile_id]) ? $companyProfiles[$jobPosters[$application->job->id_admin]->company_profile_id]->name : $application->job->company }}</p>
                                 
                                 <div class="flex items-center text-xs text-gray-500 mb-4">
                                     <div class="flex items-center mr-4">

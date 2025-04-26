@@ -56,7 +56,18 @@ class ApplicationController extends Controller
             'accepted' => JobApplication::where('user_id', $user->id)->where('status', 'accepted')->count(),
         ];
         
-        return view('jobseeker.applications.index', compact('applications', 'statusCounts', 'status', 'search'));
+        // Get company profiles to access logos and company names
+        $companyProfiles = \App\Models\CompanyProfile::all()->keyBy('id');
+        
+        // Get the users who posted these jobs to access their company profiles
+        $jobPosters = [];
+        if ($applications->count() > 0) {
+            $jobPosters = \App\Models\User::whereIn('id', $applications->pluck('job.id_admin'))
+                ->get()
+                ->keyBy('id');
+        }
+        
+        return view('jobseeker.applications.index', compact('applications', 'statusCounts', 'status', 'search', 'companyProfiles', 'jobPosters'));
     }
     
     /**
@@ -81,7 +92,11 @@ class ApplicationController extends Controller
         // Get application timeline
         $timeline = $this->getApplicationTimeline($application);
         
-        return view('jobseeker.applications.show', compact('application', 'timeline'));
+        // Get company profile for the job poster
+        $companyProfiles = \App\Models\CompanyProfile::all()->keyBy('id');
+        $jobPoster = \App\Models\User::find($application->job->id_admin);
+        
+        return view('jobseeker.applications.show', compact('application', 'timeline', 'companyProfiles', 'jobPoster'));
     }
     
     /**

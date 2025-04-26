@@ -5,14 +5,19 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     // Get company profiles to access logos
-    $companyProfiles = \App\Models\CompanyProfile::all()->keyBy('name');
+    $companyProfiles = \App\Models\CompanyProfile::all()->keyBy('id');
     
     $featuredJobs = \App\Models\Job::where('status', 'active')
         ->orderBy('created_at', 'desc')
         ->take(6)
         ->get();
     
-    return view('welcome', compact('featuredJobs', 'companyProfiles'));
+    // Get the users who posted these jobs to access their company profiles
+    $jobPosters = \App\Models\User::whereIn('id', $featuredJobs->pluck('id_admin'))
+        ->get()
+        ->keyBy('id');
+    
+    return view('welcome', compact('featuredJobs', 'companyProfiles', 'jobPosters'));
 });
 
 Route::get('/dashboard', function () {

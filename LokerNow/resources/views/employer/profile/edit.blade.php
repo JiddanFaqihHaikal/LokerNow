@@ -2,6 +2,47 @@
 @extends('layouts.app')
 
 @section('content')
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Logo preview functionality
+        const logoInput = document.getElementById('logo');
+        const logoPreview = document.getElementById('logo-preview');
+        
+        logoInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    logoPreview.src = e.target.result;
+                    logoPreview.style.display = 'block';
+                    document.getElementById('no-logo-text').style.display = 'none';
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Banner preview functionality
+        const bannerInput = document.getElementById('banner');
+        const bannerPreview = document.getElementById('banner-preview');
+        
+        bannerInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    bannerPreview.src = e.target.result;
+                    bannerPreview.style.display = 'block';
+                    document.getElementById('no-banner-text').style.display = 'none';
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+</script>
+@endpush
 <div class="px-6 py-8 bg-gray-900 text-white min-h-screen">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-white">Company Profile</h1>
@@ -35,9 +76,13 @@
             <div class="w-full">
                 <div class="relative bg-gray-700 w-full h-64 overflow-hidden">
                     @if($companyProfile->banner_path)
-                        <img src="{{ asset('storage/' . $companyProfile->banner_path) }}" alt="Company Banner" class="w-full h-64 object-cover">
+                        <img id="banner-preview" src="{{ asset('storage/' . $companyProfile->banner_path) }}" alt="Company Banner" class="w-full h-64 object-cover">
+                        <div id="no-banner-text" class="hidden w-full h-64 flex items-center justify-center text-gray-400">
+                            <span>No banner uploaded</span>
+                        </div>
                     @else
-                        <div class="w-full h-64 flex items-center justify-center text-gray-400">
+                        <img id="banner-preview" src="#" alt="Company Banner" class="w-full h-64 object-cover hidden">
+                        <div id="no-banner-text" class="w-full h-64 flex items-center justify-center text-gray-400">
                             <span>No banner uploaded</span>
                         </div>
                     @endif
@@ -57,9 +102,13 @@
                     <div class="mr-4">
                         <div class="relative h-24 w-24 rounded-lg bg-gray-700 overflow-hidden">
                             @if($companyProfile->logo_path)
-                                <img src="{{ asset('storage/' . $companyProfile->logo_path) }}" alt="Company Logo" class="w-24 h-24 object-cover">
+                                <img id="logo-preview" src="{{ asset('storage/' . $companyProfile->logo_path) }}" alt="Company Logo" class="w-24 h-24 object-cover">
+                                <div id="no-logo-text" class="hidden w-24 h-24 flex items-center justify-center text-gray-400">
+                                    <span>No logo</span>
+                                </div>
                             @else
-                                <div class="w-24 h-24 flex items-center justify-center text-gray-400">
+                                <img id="logo-preview" src="#" alt="Company Logo" class="w-24 h-24 object-cover hidden">
+                                <div id="no-logo-text" class="w-24 h-24 flex items-center justify-center text-gray-400">
                                     <span>No logo</span>
                                 </div>
                             @endif

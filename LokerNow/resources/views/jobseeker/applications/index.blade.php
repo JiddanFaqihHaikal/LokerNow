@@ -56,7 +56,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <h3 class="text-xl font-medium text-white">{{ $application->job->title }}</h3>
-                                <p class="text-gray-400">{{ $application->job->company }}</p>
+                                <p class="text-gray-400">{{ isset($jobPosters[$application->job->id_admin]) && isset($companyProfiles[$jobPosters[$application->job->id_admin]->company_profile_id]) ? $companyProfiles[$jobPosters[$application->job->id_admin]->company_profile_id]->name : $application->job->company }}</p>
                                 <div class="flex items-center mt-2">
                                     <span class="text-xs text-gray-400">Applied {{ $application->created_at->diffForHumans() }}</span>
                                     <span class="mx-2 text-gray-600">•</span>

@@ -65,31 +65,46 @@ class ProfileController extends Controller
         $companyProfile->website = $request->website;
         $companyProfile->tagline = $request->tagline;
         
-        // Handle logo upload
-        if ($request->hasFile('logo')) {
-            // Delete old logo if exists
-            if ($companyProfile->logo_path) {
-                Storage::delete('public/' . $companyProfile->logo_path);
+        try {
+            // Handle logo upload
+            if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
+                // Delete old logo if exists
+                if ($companyProfile->logo_path) {
+                    Storage::delete('public/' . $companyProfile->logo_path);
+                }
+                
+                $logoPath = $request->file('logo')->store('uploads/company/logos', 'public');
+                $companyProfile->logo_path = $logoPath;
             }
             
-            $logoPath = $request->file('logo')->store('uploads/company/logos', 'public');
-            $companyProfile->logo_path = $logoPath;
-        }
-        
-        // Handle banner upload
-        if ($request->hasFile('banner')) {
-            // Delete old banner if exists
-            if ($companyProfile->banner_path) {
-                Storage::delete('public/' . $companyProfile->banner_path);
+            // Handle banner upload
+            if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
+                // Delete old banner if exists
+                if ($companyProfile->banner_path) {
+                    Storage::delete('public/' . $companyProfile->banner_path);
+                }
+                
+                $bannerPath = $request->file('banner')->store('uploads/company/banners', 'public');
+                $companyProfile->banner_path = $bannerPath;
             }
             
-            $bannerPath = $request->file('banner')->store('uploads/company/banners', 'public');
-            $companyProfile->banner_path = $bannerPath;
+            // Save the changes
+            if (!$companyProfile->save()) {
+                throw new \Exception('Failed to save company profile');
+            }
+            
+            // Update the user's company_profile_id if it's not set
+            if (!$user->company_profile_id) {
+                $user->company_profile_id = $companyProfile->id;
+                $user->save();
+            }
+            
+            return redirect()->route('employer.profile.edit')
+                ->with('success', 'Company profile updated successfully.');
+                
+        } catch (\Exception $e) {
+            return redirect()->route('employer.profile.edit')
+                ->with('error', 'Error saving profile: ' . $e->getMessage());
         }
-        
-        $companyProfile->save();
-        
-        return redirect()->route('employer.profile.edit')
-            ->with('success', 'Company profile updated successfully.');
     }
 }

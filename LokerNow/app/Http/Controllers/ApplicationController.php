@@ -21,8 +21,19 @@ class ApplicationController extends Controller
             ->with('job')
             ->latest()
             ->get();
+        
+        // Get company profiles to access logos and company names
+        $companyProfiles = \App\Models\CompanyProfile::all()->keyBy('id');
+        
+        // Get the users who posted these jobs to access their company profiles
+        $jobPosters = [];
+        if ($applications->count() > 0) {
+            $jobPosters = \App\Models\User::whereIn('id', $applications->pluck('job.id_admin'))
+                ->get()
+                ->keyBy('id');
+        }
             
-        return view('application-status', compact('applications'));
+        return view('application-status', compact('applications', 'companyProfiles', 'jobPosters'));
     }
     
     /**

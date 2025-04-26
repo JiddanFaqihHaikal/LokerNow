@@ -58,6 +58,14 @@
                         ->pluck('job_id')
                         ->toArray();
                 }
+                
+                // Get company profiles to access logos and company names
+                $companyProfiles = \App\Models\CompanyProfile::all()->keyBy('id');
+                
+                // Get the users who posted these jobs to access their company profiles
+                $jobPosters = \App\Models\User::whereIn('id', $recommendedJobs->pluck('id_admin'))
+                    ->get()
+                    ->keyBy('id');
             @endphp
             
             @forelse($recommendedJobs as $job)
@@ -66,7 +74,7 @@
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <h3 class="text-lg font-semibold text-white mb-1">{{ $job->title }}</h3>
-                                <p class="text-gray-400 text-sm">{{ $job->company }}</p>
+                                <p class="text-gray-400 text-sm">{{ isset($jobPosters[$job->id_admin]) && isset($companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]) ? $companyProfiles[$jobPosters[$job->id_admin]->company_profile_id]->name : $job->company }}</p>
                             </div>
                             <div>
                                 @if(in_array($job->id_job, $savedJobIds))

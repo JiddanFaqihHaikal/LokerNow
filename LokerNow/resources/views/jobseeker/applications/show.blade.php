@@ -18,7 +18,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <h1 class="text-2xl font-bold text-white">{{ $application->job->title }}</h1>
-                        <p class="text-gray-400">{{ $application->job->company }}</p>
+                        <p class="text-gray-400">{{ isset($jobPoster) && isset($companyProfiles[$jobPoster->company_profile_id]) ? $companyProfiles[$jobPoster->company_profile_id]->name : $application->job->company }}</p>
                     </div>
                     
                     <!-- Status Badge -->
