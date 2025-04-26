@@ -93,6 +93,16 @@ The LokerNow platform is built around a relational database structure that conne
    ```
    php artisan storage:link
    ```
+   
+8. Install node modules:
+   ```
+   npm install
+   ```
+
+8. Build the npm:
+   ```
+   npm run build
+   ```
 
 9. Start the development server:
    ```
